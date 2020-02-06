@@ -1,0 +1,71 @@
+//八皇后问题（深搜 + 递归） 
+#include<stdio.h>
+#define NUM 8//皇后数量 
+
+int count = 0;//如需计数，则必须有一个有文件作用域的变量
+
+int check(int i,int j,int (*queen)[NUM]);//最后一个参数也可以写成二维数组
+int setQueen(int col,int (*queen)[NUM]);//返回值主要用于标志函数结束 
+
+int main(void)
+{
+	int queen[NUM][NUM] = {0};//记得初始化为 0 
+	int i,j;
+	
+	setQueen(0,queen);//从第一列开始按列分步排查
+	
+	return 0; 
+}
+
+int check(int i,int j,int (*queen)[NUM])//因为此方案中按列排查，所以只用考虑同一行的左半部分和对角线的左上和左下有没有 1 
+{
+	int s,t;//临时变量，分别代表行和列
+	
+	//判断同一行的左半边
+	for(s = i,t = 0;t < j;t++)
+		if(queen[s][t] == 1)
+			return 0;
+	//判断左下方
+	for(s = i+1,t = j-1;s < NUM && t >= 0;s++,t--)
+		if(queen[s][t] == 1)
+			return 0;
+	//判断左上方
+	for(s = i-1,t = j-1;s >= 0 && t >= 0;s--,t--)
+		if(queen[s][t] == 1)
+			return 0;
+	
+	return 1; 
+}
+
+int setQueen(int col,int (*queen)[NUM])
+{
+	int i,j,row;
+	
+	if(col == NUM)
+	{
+		printf("%d.\n",++count); 
+		for(i = 0;i < NUM;i++)
+		{
+			for(j = 0;j < NUM;j++)
+				if(queen[i][j] != 0)
+					printf("Q ");
+				else
+				printf("* "); 
+			putchar('\n');
+		 }
+		 putchar('\n');//让不同种类之间有一个空行
+		 
+		 return 0;//？可以这么写吗 
+	}
+	
+	//迭代每一行 
+	for(row = 0;row < NUM;row++)
+	{
+		if(check(row,col,queen))//判断能否放置
+		{
+			queen[row][col] = 1;//先放上
+			setQueen(col+1,queen);//看下一列及以后能不能正常放置 
+			queen[row][col] = 0;//若能全部放置，则在打印后把该元素重置为 0，相当于搜索下一种方案，若不能全部放置，则在相应基础上搜索下一种方案 
+		 } 
+	 } 
+}
